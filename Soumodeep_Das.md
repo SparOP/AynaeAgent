@@ -3,7 +3,10 @@ Role: LLM & Prompt Engineering Lead
 Responsible Files:
 
 llm/question_generator.py
+app.py
+
 Core Responsibilities:
+
 Design structured prompt templates
 Implement dynamic prompt builder
 Integrate Gemini API calls
