@@ -5,7 +5,7 @@
 # Primary Owner: Sparsho Sengupta
 
 import numpy as np
-import google.generativeai as genai
+import google.genai as genai
 from typing import List
 
 # CONFIGURATION
@@ -87,10 +87,14 @@ def compute_reference_similarity(answers: List[str], reference_text: str) -> flo
 
     return float(np.mean(similarities))
 
+
 # FINAL SEMANTIC SCORE
 
-def compute_semantic_score(answers: List[str], reference_text: str, min_words: int = 25) -> float:
-    # Validate minimum length
+
+def compute_semantic_score(
+    answers: List[str], reference_text: str, min_words: int = 25
+) -> float:
+
     for ans in answers:
         if not is_valid_length(ans, min_words):
             raise ValueError(
