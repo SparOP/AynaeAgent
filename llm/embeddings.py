@@ -5,32 +5,27 @@
 # Primary Owner: Sparsho Sengupta
 
 import numpy as np
-import google.generativeai as genai
+import google.genai as genai
 from typing import List
 
 # CONFIGURATION
 
-genai.configure(api_key="AIzaSyCF9rspw5t0hH35FHd53x17051zxXHNk6I")
+genai.configure(api_key="GEMINI_API_KEY")
+
 # EMBEDDING GENERATION
+
 
 def generate_embedding(text: str, model: str = "models/embedding-001") -> List[float]:
 
-    response = genai.embed_content(
-        model=model,
-        content=text
-    )
+    response = genai.embed_content(model=model, content=text)
     return response["embedding"]
 
 
-# ==========================
 # COSINE SIMILARITY
-# ==========================
+
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
-    """
-    Computes cosine similarity between two embedding vectors.
-    Returns value between -1 and 1.
-    """
+
     v1 = np.array(vec1)
     v2 = np.array(vec2)
 
@@ -41,26 +36,19 @@ def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
     return float(similarity)
 
 
-# ==========================
 # WORD COUNT VALIDATION
-# ==========================
+
 
 def is_valid_length(text: str, min_words: int = 25) -> bool:
-    """
-    Ensures answer has minimum word threshold before embedding.
-    """
     word_count = len(text.strip().split())
     return word_count >= min_words
 
 
-# ==========================
-# CROSS ANSWER SIMILARITY
-# ==========================
+# CROSS ANSWER SIMILARITY (CAS)
+
 
 def compute_cross_similarity(answers: List[str]) -> float:
-    """
-    Computes average cosine similarity between all pairs of answers.
-    """
+
     if len(answers) < 2:
         return 0.0
 
@@ -79,14 +67,11 @@ def compute_cross_similarity(answers: List[str]) -> float:
     return float(np.mean(similarities))
 
 
-# ==========================
-# REFERENCE ALIGNMENT
-# ==========================
+# REFERENCE ALIGNMENT (RAS)
+
 
 def compute_reference_similarity(answers: List[str], reference_text: str) -> float:
-    """
-    Computes average similarity between each answer and reference explanation.
-    """
+
     reference_embedding = generate_embedding(reference_text)
 
     similarities = []
@@ -102,27 +87,19 @@ def compute_reference_similarity(answers: List[str], reference_text: str) -> flo
     return float(np.mean(similarities))
 
 
-# ==========================
 # FINAL SEMANTIC SCORE
-# ==========================
+
 
 def compute_semantic_score(
-    answers: List[str],
-    reference_text: str,
-    min_words: int = 25
+    answers: List[str], reference_text: str, min_words: int = 25
 ) -> float:
-    """
-    Computes final semantic score combining:
-    - Cross-answer similarity
-    - Reference similarity
-
-    Returns value between 0 and 1.
-    """
 
     # Validate minimum length
     for ans in answers:
         if not is_valid_length(ans, min_words):
-            raise ValueError("One or more answers do not meet minimum word requirement.")
+            raise ValueError(
+                "One or more answers do not meet minimum word requirement."
+            )
 
     cross_similarity = compute_cross_similarity(answers)
     reference_similarity = compute_reference_similarity(answers, reference_text)
