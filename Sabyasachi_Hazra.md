@@ -26,3 +26,6 @@ How It Connects:
 Central brain of system. Calls embedding → scoring → decision → possibly re-calls question_generator.
 
 Issues faced during implementation:
+
+Very hard project. I get confused :)
+Sparsho there. Daddy said daddy help :)
