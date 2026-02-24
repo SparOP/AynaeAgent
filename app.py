@@ -1,7 +1,7 @@
 # app.py
 import streamlit as st
 import time
-from question_engine import generate_questions   
+from question_engine import generate_questions
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -35,19 +35,30 @@ if "evaluated" not in st.session_state:
 if "topic" not in st.session_state:
     st.session_state.topic = ""
 
+
+# ---------------- SAFE EXECUTION WRAPPER ----------------
+def safe_generate(topic, mode):
+    try:
+        return generate_questions(topic, mode)
+    except Exception as e:
+        st.error("⚠️ Question engine failed.")
+        st.exception(e)
+        return []
+
+
 # =====================================================
-# ---------------- STEP 3: TOPIC INPUT ----------------
+# STEP 3 – TOPIC INPUT
 # =====================================================
 
 st.divider()
 st.header("📘 Enter Topic")
 
 topic = st.text_input("Enter a topic you studied:")
-
 generate_btn = st.button("Generate Questions")
 
+
 # =====================================================
-# ---------------- STEP 4: GENERATE QUESTIONS ---------
+# STEP 4 – GENERATE QUESTIONS (MODIFIED CORRECTLY)
 # =====================================================
 
 if generate_btn:
@@ -55,17 +66,22 @@ if generate_btn:
     if topic.strip() == "":
         st.warning("Please enter a topic.")
     else:
-        try:
-            with st.spinner("Generating multi-framed questions..."):
-                questions = generate_questions(topic, st.session_state.mode)
-                time.sleep(1)
-
-            st.session_state.questions = questions
+        with st.spinner("Generating multi-framed questions..."):
+            time.sleep(1)
+            st.session_state.questions = safe_generate(topic, st.session_state.mode)
             st.session_state.topic = topic
             st.session_state.evaluated = False
 
-        except Exception as e:
-            st.error("Question generation failed. Please try again.")
-# Purpose: Main Streamlit entry point for AynaeAgent. Handles user interaction, topic input,
-# answer collection, and connects all backend modules (LLM, embeddings, scoring, decision).
-# Primary Owner: Soumojeet Dutta and Soumodeep Das
+
+# =====================================================
+# STEP 5 – DISPLAY QUESTIONS (STABILITY LAYER)
+# =====================================================
+
+st.divider()
+st.subheader("Generated Questions")
+
+if st.session_state.questions:
+    for i, q in enumerate(st.session_state.questions, 1):
+        st.markdown(f"**Q{i}:** {q}")
+else:
+    st.info("No questions generated yet.")
