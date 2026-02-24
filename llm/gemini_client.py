@@ -1,14 +1,12 @@
 # llm/gemini_client.py
 
 import os
+from dotenv import load_dotenv
+from google import genai
 
-USE_OFFLINE_MODE = False  # 🔥 Toggle this if API fails
+load_dotenv()
 
-try:
-    import google.generativeai as genai
-except:
-    USE_OFFLINE_MODE = True
-
+USE_OFFLINE_MODE = False  # toggle manually if needed
 
 # ==============================
 # OFFLINE RESPONSES (Fallback)
@@ -16,32 +14,34 @@ except:
 
 OFFLINE_RESPONSES = {
     "reference": {
-        "recursion": "Recursion is a programming technique where a function calls itself to solve smaller instances of a problem. It requires a base case to stop infinite calls. It is useful for problems that can be broken into similar subproblems.",
+        "recursion": "Recursion is a programming technique where a function calls itself to solve smaller instances of a problem. It requires a base case to stop infinite calls."
     },
     "questions": {
         "normal": "Can you explain recursion in your own words?",
-        "reframed": "Can you describe recursion using a real-life example or analogy?",
+        "reframed": "Can you describe recursion using a real-life example?",
         "fundamental": "What does it mean when a function calls itself?",
-        "clarification": "How is recursion different from using loops?",
+        "clarification": "How is recursion different from loops?",
         "advanced": "What problems are better suited for recursion than iteration, and why?",
     },
 }
 
+# ==============================
+# GEMINI CLIENT (NEW SDK)
+# ==============================
 
-# ==============================
-# GEMINI SETUP
-# ==============================
+client = None
 
 if not USE_OFFLINE_MODE:
     try:
-        API_KEY = os.getenv("GEMINI_API_KEY")  # safer than hardcoding
-        genai.configure(api_key=API_KEY)
+        API_KEY = os.getenv("GEMINI_API_KEY")
+        if not API_KEY:
+            raise ValueError("Missing GEMINI_API_KEY in .env")
 
-        model = genai.GenerativeModel(
-            "gemini-1.5-flash",
-            generation_config={"temperature": 0.5},
-        )
-    except:
+        client = genai.Client(api_key=API_KEY)
+        print("✅ Gemini initialized")
+
+    except Exception as e:
+        print("❌ Gemini init failed:", e)
         USE_OFFLINE_MODE = True
 
 
@@ -50,11 +50,9 @@ if not USE_OFFLINE_MODE:
 # ==============================
 
 def ask_gemini(prompt: str, mode: str = None) -> str:
-    """
-    mode is used only for offline fallback
-    """
+    """Call Gemini or fallback"""
 
-    if USE_OFFLINE_MODE:
+    if USE_OFFLINE_MODE or client is None:
         if mode == "reference":
             return OFFLINE_RESPONSES["reference"]["recursion"]
         if mode:
@@ -62,8 +60,13 @@ def ask_gemini(prompt: str, mode: str = None) -> str:
         return "Explain the concept clearly."
 
     try:
-        response = model.generate_content(prompt)
+        print("🔥 Calling Gemini...")
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
         return response.text.strip()
+
     except Exception as e:
-        print("Gemini error, switching to fallback:", e)
+        print("❌ Gemini runtime error:", e)
         return "Explain the concept clearly."
