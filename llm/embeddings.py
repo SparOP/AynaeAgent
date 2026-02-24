@@ -35,27 +35,18 @@ def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
     similarity = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
     return float(similarity)
 
-
-# ==========================
 # WORD COUNT VALIDATION
-# ==========================
 
 def is_valid_length(text: str, min_words: int = 25) -> bool:
-    """
-    Ensures answer has minimum word threshold before embedding.
-    """
+   
     word_count = len(text.strip().split())
     return word_count >= min_words
 
-
-# ==========================
 # CROSS ANSWER SIMILARITY
-# ==========================
+
 
 def compute_cross_similarity(answers: List[str]) -> float:
-    """
-    Computes average cosine similarity between all pairs of answers.
-    """
+
     if len(answers) < 2:
         return 0.0
 
