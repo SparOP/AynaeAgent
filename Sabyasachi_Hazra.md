@@ -24,3 +24,5 @@ How deterministic logic controls the agent
 How It Connects:
 
 Central brain of system. Calls embedding → scoring → decision → possibly re-calls question_generator.
+
+Issues faced during implementation:

@@ -3,6 +3,7 @@ Role: LLM & Prompt Engineering Lead
 Responsible Files:
 
 llm/question_generator.py
+llm/reference_generator.py
 app.py
 
 Core Responsibilities:
@@ -22,3 +23,5 @@ How mode (normal/deeper_probe/advanced) modifies question generation
 How It Connects:
 
 app.py calls question_generator → returns question → passed to user → then evaluation continues.
+
+Issues faced during implementation:

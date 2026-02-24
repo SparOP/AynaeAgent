@@ -20,3 +20,5 @@ How low similarity implies conceptual instability
 How It Connects:
 
 agent_loop.py passes user answers → embeddings.py returns similarity score → scoring.py consumes it.
+
+Issues faced during implementation:
