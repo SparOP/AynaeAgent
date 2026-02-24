@@ -10,7 +10,7 @@ from typing import List
 
 # CONFIGURATION
 
-genai.configure(api_key="xxxx")  # Waiting for Soumodeep to provide API key for testing. Replace with actual key in production.
+genai.configure(api_key="AIzaSyCF9rspw5t0hH35FHd53x17051zxXHNk6I")
 
 # EMBEDDING GENERATION
 
@@ -22,16 +22,10 @@ def generate_embedding(text: str, model: str = "models/embedding-001") -> List[f
     )
     return response["embedding"]
 
-
-# ==========================
 # COSINE SIMILARITY
-# ==========================
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
-    """
-    Computes cosine similarity between two embedding vectors.
-    Returns value between -1 and 1.
-    """
+
     v1 = np.array(vec1)
     v2 = np.array(vec2)
 
