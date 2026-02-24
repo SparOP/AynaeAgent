@@ -10,7 +10,7 @@ from typing import List
 
 # CONFIGURATION
 
-genai.configure(api_key="AIzaSyCF9rspw5t0hH35FHd53x17051zxXHNk6I")
+genai.configure(api_key="GEMINI_API_KEY")
 
 # EMBEDDING GENERATION
 
@@ -72,9 +72,7 @@ def compute_cross_similarity(answers: List[str]) -> float:
 
 
 def compute_reference_similarity(answers: List[str], reference_text: str) -> float:
-    """
-    Computes average similarity between each answer and reference explanation.
-    """
+
     reference_embedding = generate_embedding(reference_text)
 
     similarities = []
