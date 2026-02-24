@@ -14,15 +14,15 @@ genai.configure(api_key="AIzaSyCF9rspw5t0hH35FHd53x17051zxXHNk6I")
 
 # EMBEDDING GENERATION
 
+
 def generate_embedding(text: str, model: str = "models/embedding-001") -> List[float]:
 
-    response = genai.embed_content(
-        model=model,
-        content=text
-    )
+    response = genai.embed_content(model=model, content=text)
     return response["embedding"]
 
+
 # COSINE SIMILARITY
+
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
 
@@ -35,14 +35,17 @@ def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
     similarity = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
     return float(similarity)
 
+
 # WORD COUNT VALIDATION
 
+
 def is_valid_length(text: str, min_words: int = 25) -> bool:
-   
+
     word_count = len(text.strip().split())
     return word_count >= min_words
 
-# CROSS ANSWER SIMILARITY
+
+# CROSS ANSWER SIMILARITY (CAS)
 
 
 def compute_cross_similarity(answers: List[str]) -> float:
@@ -65,9 +68,8 @@ def compute_cross_similarity(answers: List[str]) -> float:
     return float(np.mean(similarities))
 
 
-# ==========================
-# REFERENCE ALIGNMENT
-# ==========================
+# REFERENCE ALIGNMENT (RAS)
+
 
 def compute_reference_similarity(answers: List[str], reference_text: str) -> float:
     """
@@ -87,28 +89,15 @@ def compute_reference_similarity(answers: List[str], reference_text: str) -> flo
 
     return float(np.mean(similarities))
 
-
-# ==========================
 # FINAL SEMANTIC SCORE
-# ==========================
 
-def compute_semantic_score(
-    answers: List[str],
-    reference_text: str,
-    min_words: int = 25
-) -> float:
-    """
-    Computes final semantic score combining:
-    - Cross-answer similarity
-    - Reference similarity
-
-    Returns value between 0 and 1.
-    """
-
+def compute_semantic_score(answers: List[str], reference_text: str, min_words: int = 25) -> float:
     # Validate minimum length
     for ans in answers:
         if not is_valid_length(ans, min_words):
-            raise ValueError("One or more answers do not meet minimum word requirement.")
+            raise ValueError(
+                "One or more answers do not meet minimum word requirement."
+            )
 
     cross_similarity = compute_cross_similarity(answers)
     reference_similarity = compute_reference_similarity(answers, reference_text)
