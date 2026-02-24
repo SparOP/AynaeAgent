@@ -8,26 +8,14 @@ import numpy as np
 import google.generativeai as genai
 from typing import List
 
-# ==========================
 # CONFIGURATION
-# ==========================
 
-# Set your API key using environment variable
-# DO NOT hardcode API keys
-# export GOOGLE_API_KEY="your_key"  (Mac/Linux)
-# setx GOOGLE_API_KEY "your_key"    (Windows)
+genai.configure(api_key="xxxx")  # Waiting for Soumodeep to provide API key for testing. Replace with actual key in production.
 
-genai.configure(api_key="YOUR_API_KEY")  # Replace during testing or use env
-
-
-# ==========================
 # EMBEDDING GENERATION
-# ==========================
 
 def generate_embedding(text: str, model: str = "models/embedding-001") -> List[float]:
-    """
-    Generates embedding vector for given text using Gemini embedding model.
-    """
+
     response = genai.embed_content(
         model=model,
         content=text
