@@ -10,6 +10,11 @@ import streamlit as st
 import time
 from llm.question_generator import generate_question
 
+from storage.database import DatabaseManager
+
+db = DatabaseManager()
+
+
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="AyenaeAgent",

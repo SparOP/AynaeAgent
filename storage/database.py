@@ -10,16 +10,20 @@ import uuid
 from datetime import datetime
 
 
-class DatabaseManager:
-    """
-    Handles SQLite storage for:
-    - Session results
-    - Stability scores
-    - Weak area tracking
-    - Historical retrieval
-    """
+import os
 
-    def __init__(self, db_path="aynaeaagent.db"):
+class DatabaseManager:
+    def __init__(self, db_path=None):
+        """
+        Ensures database is always created in project root
+        regardless of where script is executed from.
+        """
+
+        if db_path is None:
+            # storage/database.py → go 2 folders up → project root
+            BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            db_path = os.path.join(BASE_DIR, "aynaeaagent.db")
+
         self.db_path = db_path
         self._create_table()
 
