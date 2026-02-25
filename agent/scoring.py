@@ -33,7 +33,7 @@ class StabilityScorer:
                 reference_similarity,
                 answers_list):
         """
-        Returns final stability score (0–100).
+        Returns final stability score (0-100).
         """
 
         semantic_score = self._semantic_component(
@@ -67,8 +67,8 @@ class StabilityScorer:
                             reference_similarity):
         """
         Combines cross-answer and reference similarity.
-        Input expected in 0–1 range.
-        Output scaled to 0–100.
+        Input expected in 0-1 range.
+        Output scaled to 0-100.
         """
 
         semantic = 0.5 * cross_similarity + \
