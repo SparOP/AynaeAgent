@@ -4,9 +4,11 @@
 # Primary Owner: Soumojeet Dutta and Soumodeep Das 
 
 # app.py
+# Main UI for AyenaeAgent
+
 import streamlit as st
 import time
-from question_engine import generate_questions
+from llm.question_generator import generate_question
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -14,79 +16,82 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------- TITLE SECTION ----------------
+# ---------------- TITLE ----------------
 st.title("🧠 AyenaeAgent")
 st.markdown("""
 ### Adaptive Agentic System for Concept Stability Evaluation  
 Detecting Illusion of Understanding using Multi-Framed Questioning
 """)
 
-# ---------------- SESSION STATE INITIALIZATION ----------------
-if "mode" not in st.session_state:
-    st.session_state.mode = "normal"
+# ---------------- SESSION STATE ----------------
+defaults = {
+    "mode": "normal",
+    "questions": [],
+    "topic": "",
+    "generated": False
+}
 
-if "questions" not in st.session_state:
-    st.session_state.questions = []
-
-if "answers" not in st.session_state:
-    st.session_state.answers = []
-
-if "csi" not in st.session_state:
-    st.session_state.csi = None
-
-if "evaluated" not in st.session_state:
-    st.session_state.evaluated = False
-
-if "topic" not in st.session_state:
-    st.session_state.topic = ""
+for key, val in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = val
 
 
-# ---------------- SAFE EXECUTION WRAPPER ----------------
+# ---------------- SAFE WRAPPER ----------------
 def safe_generate(topic, mode):
     try:
-        return generate_questions(topic, mode)
+        return generate_question(topic, mode)
     except Exception as e:
-        st.error("⚠️ Question engine failed.")
+        st.error("⚠️ Gemini failed")
         st.exception(e)
         return []
 
 
 # =====================================================
-# STEP 3 – TOPIC INPUT
+# TOPIC INPUT
 # =====================================================
-
 st.divider()
 st.header("📘 Enter Topic")
 
-topic = st.text_input("Enter a topic you studied:")
-generate_btn = st.button("Generate Questions")
+topic_input = st.text_input(
+    "Enter a topic you studied:",
+    placeholder="Example: Operating System Scheduling"
+)
+
+generate_btn = st.button("🚀 Generate Questions")
 
 
-# =====================================================
-# STEP 4 – GENERATE QUESTIONS (MODIFIED CORRECTLY)
-# =====================================================
-
+# ================= GENERATE =================
 if generate_btn:
-
-    if topic.strip() == "":
+    if topic_input.strip() == "":
         st.warning("Please enter a topic.")
     else:
         with st.spinner("Generating multi-framed questions..."):
             time.sleep(1)
-            st.session_state.questions = safe_generate(topic, st.session_state.mode)
-            st.session_state.topic = topic
-            st.session_state.evaluated = False
+
+            qs = safe_generate(topic_input, st.session_state.mode)
+
+            # ---- SAFETY GUARD ----
+            if isinstance(qs, str):
+                qs = [qs]
+            elif qs is None:
+                qs = []
+
+            st.session_state.questions = qs
+            st.session_state.topic = topic_input
+            st.session_state.generated = True
 
 
-# =====================================================
-# STEP 5 – DISPLAY QUESTIONS (STABILITY LAYER)
-# =====================================================
-
+# ================= SHOW QUESTIONS =================
 st.divider()
-st.subheader("Generated Questions")
+st.subheader("🧠 Generated Questions")
 
-if st.session_state.questions:
-    for i, q in enumerate(st.session_state.questions, 1):
-        st.markdown(f"**Q{i}:** {q}")
+if st.session_state.generated:
+    if st.session_state.questions:
+        st.success(f"Topic: {st.session_state.topic}")
+
+        for i, q in enumerate(st.session_state.questions, 1):
+            st.markdown(f"**Q{i}.** {q}")
+    else:
+        st.warning("No questions generated.")
 else:
-    st.info("No questions generated yet.")
+    st.info("Enter a topic and click Generate.")

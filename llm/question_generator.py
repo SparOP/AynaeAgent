@@ -104,18 +104,17 @@ Avoid basic definitions.
 # UNIFIED INTERFACE (TEAM USES THIS)
 # ==============================
 
-def generate_question(topic: str, mode: str = "normal") -> str:
-    if mode == "fundamental_probe":
-        return fundamental_probe(topic)
+def generate_question(topic: str, mode: str = "normal") -> list:
 
-    elif mode == "clarification_probe":
-        return clarification_probe(topic)
+    mode_map = {
+        "normal": normal_question,
+        "reframed": reframed_question,
+        "fundamental_probe": fundamental_probe,
+        "clarification_probe": clarification_probe,
+        "advanced": advanced_probe,
+    }
 
-    elif mode == "advanced":
-        return advanced_probe(topic)
+    if mode not in mode_map:
+        mode = "normal"
 
-    elif mode == "reframed":
-        return reframed_question(topic)
-
-    else:
-        return normal_question(topic)
+    return [mode_map[mode](topic)]
